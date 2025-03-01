@@ -21,7 +21,7 @@ export class CreateAgendamentoRepository {
     return result[0]?.id ?? undefined;
   }
 
-  async createAgendamento(data: CreateAgendamentoInputDto): Promise<void> {
+  async createAgendamento(data: CreateAgendamentoInputDto): Promise<number> {
     const sql = `
       INSERT INTO AGENDAMENTOS (
         DESCRICAO,
@@ -33,16 +33,15 @@ export class CreateAgendamentoRepository {
         $2,
         $3,
         $4
-      )
+      ) RETURNING ID
     `;
 
-    const binds = [
-      data.descricao.toUpperCase(),
-      data.inicio,
-      data.fim,
-      data.completo,
-    ];
+    const binds = [data.descricao, data.inicio, data.fim, data.completo];
 
-    await this.dataBaseService.query(sql, binds);
+    const result = await this.dataBaseService.queryBindOut<{ id: number }>(
+      sql,
+      binds,
+    );
+    return result.rows[0].id;
   }
 }

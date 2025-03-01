@@ -29,8 +29,8 @@ export class UpdateAgendamentoRepository {
       UPDATE AGENDAMENTOS
         SET
           ${data.completo === false || data.completo === true ? `COMPLETO = ${data.completo},` : ''}
-          ${data.inicio ? `INICIO = ${data.inicio},` : ''}
-          ${data.fim ? `FIM = ${data.fim},` : ''}
+          ${data.inicio ? `INICIO = TO_TIMESTAMP('${data.inicio}', 'YYYY-MM-DD"T"HH24:MI'),` : ''}
+          ${data.fim ? `FIM = TO_TIMESTAMP('${data.fim}', 'YYYY-MM-DD"T"HH24:MI'),` : ''}
           DATA_ATUALIZACAO = CURRENT_TIMESTAMP
       WHERE ID = $1
     `;
@@ -38,6 +38,7 @@ export class UpdateAgendamentoRepository {
     const binds = {
       id,
     };
+
     await this.dataBaseService.query(sql, binds);
   }
 }

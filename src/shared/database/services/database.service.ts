@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Injectable, Logger } from '@nestjs/common';
-import { Pool, PoolClient, QueryResult } from 'pg';
+import { Pool, PoolClient, QueryResult, QueryResultRow } from 'pg';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -116,6 +116,34 @@ export class DataBaseService {
     } catch (err) {
       if (isLogging) this.logger.debug(`query: ${sql}`);
       this.logger.error(`query: ${err.stack}`);
+      throw new Error(err);
+    }
+  }
+
+  async queryBindOut<T extends QueryResultRow>(
+    sql: string,
+    binds: any[] = [],
+    client: PoolClient | null = null,
+  ): Promise<QueryResult<T>> {
+    let isOpenTransaction = true;
+
+    const isLogging = process.env.DB_LOGGING as string;
+
+    try {
+      if (!client) {
+        client = await this.open();
+        isOpenTransaction = false;
+      }
+
+      const result: QueryResult<T> = await client.query(sql, binds);
+
+      if (!isOpenTransaction) this.commitAndClose(client);
+      if (isLogging) this.logger.debug(sql);
+
+      return result;
+    } catch (err) {
+      if (isLogging) this.logger.debug(`queryBindOut: ${sql}`);
+      this.logger.error(`queryBindOut: ${err.stack}`);
       throw new Error(err);
     }
   }

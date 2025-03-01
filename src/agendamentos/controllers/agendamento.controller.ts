@@ -43,18 +43,29 @@ export class AgendamentoController {
   }
 
   @Post()
-  @ApiCreatedResponse({ description: 'agendamento criado com sucesso!' })
-  @ApiOperation({ summary: 'recebe um agendamento e cria no banco de dados' })
+  @ApiCreatedResponse({
+    description: 'agendamento criado com sucesso!',
+    type: Number,
+    example: 5,
+  })
+  @ApiOperation({
+    summary:
+      'recebe um agendamento e cria no banco de dados retornando o id da criação',
+  })
   @ApiBadRequestResponse({ description: 'horário indisponível' })
   @ApiInternalServerErrorResponse({
     description: 'ocorreu um erro ao salvar o agendamento!',
   })
-  async createAgendamento(@Body() data: CreateAgendamentoInputDto) {
+  async createAgendamento(
+    @Body() data: CreateAgendamentoInputDto,
+  ): Promise<number> {
     return await this.createAgendamentoService.execute(data);
   }
 
   @Put('/:id')
-  @ApiOkResponse({ description: 'agendamento atualizado com sucesso!' })
+  @ApiOkResponse({
+    description: 'agendamento atualizado com sucesso!',
+  })
   @ApiOperation({
     summary: 'recebe parâmetros e atualiza no banco de dados',
   })

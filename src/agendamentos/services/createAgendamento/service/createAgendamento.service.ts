@@ -12,7 +12,7 @@ export class CreateAgendamentoService {
     private readonly createAgendamentoRepository: CreateAgendamentoRepository,
   ) {}
 
-  async execute(data: CreateAgendamentoInputDto) {
+  async execute(data: CreateAgendamentoInputDto): Promise<number> {
     try {
       data.inicio = data.inicio.split('T').join(' ');
       data.fim = data.fim.split('T').join(' ');

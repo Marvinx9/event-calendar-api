@@ -1,15 +1,45 @@
+networks:
+  db-network:
+    driver: bridge
+  event-calendar-network:
+    driver: bridge
+
 services:
-  db:
+  postgres:
     image: postgres
+    container_name: event-calendar-db
     restart: always
     environment:
       - POSTGRES_USER=${DB_USERNAME}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
+    networks:
+      - db-network
     ports:
-      - '5432:5432'
+      - ${DB_PORT}:5432
     volumes:
       - postgres:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: './'
+    container_name: event-calendar-api
+    restart: always
+    networks:
+      - event-calendar-network
+      - db-network
+    environment:
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - DB_PORT=${DB_PORT}
+      - DB_HOST=postgres
+      - DB_LOGGING=${DB_LOGGING}
+      - PORT=${PORT}
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
 
 volumes:
   postgres:

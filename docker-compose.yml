@@ -41,6 +41,20 @@ services:
     depends_on:
       - postgres
 
+  frontend:
+    build:
+      context: '../event-calendar/'
+    container_name: event-calendar
+    restart: always
+    networks:
+      - event-calendar-network
+    environment:
+      - PORT=3000
+    ports:
+      - 3000:3000
+    depends_on:
+      - backend
+
 volumes:
   postgres:
     driver: local
